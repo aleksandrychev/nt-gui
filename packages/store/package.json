@@ -19,6 +19,7 @@
     "@northern.tech/utils": "*"
   },
   "peerDependencies": {
+    "@northern.tech/typescript-config": "*",
     "@mdi/js": "7.4.47",
     "@mui/icons-material": "6.1.2",
     "@reduxjs/toolkit": "2.2.7",
