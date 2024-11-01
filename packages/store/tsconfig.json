@@ -5,7 +5,8 @@
     "rootDir": ".",
     "baseUrl": ".",
     "paths": {
-      "@northern.tech/store/*": ["*"]
+      "@northern.tech/store/*": ["*"],
+      "@northern.tech/typescript-config/*": ["node_modules/@northern.tech/typescript-config/packages/typescript-config/*"]
     }
   }
 }
