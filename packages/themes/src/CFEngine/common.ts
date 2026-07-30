@@ -12,7 +12,7 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 import type { FormControlProps } from '@mui/material';
-import { Color, autocompleteClasses, inputBaseClasses, outlinedInputClasses } from '@mui/material';
+import { Color, autocompleteClasses, inputBaseClasses, outlinedInputClasses, switchClasses } from '@mui/material';
 
 const componentProps = {
   MuiTextField: {
@@ -29,6 +29,12 @@ const componentProps = {
     defaultProps: {
       autoWidth: true,
       variant: 'standard' as FormControlProps['variant']
+    },
+    styleOverrides: {
+      select: {
+        paddingLeft: '12px',
+        minHeight: 'inherit'
+      }
     }
   }
 };
@@ -72,6 +78,7 @@ export const red = {
   400: '#E25D50',
   300: '#DA7972',
   200: '#E79D99',
+  100: '#F5D3CF',
   50: '#FCF1EF'
 };
 export const orange = {
@@ -136,6 +143,8 @@ export const darkBackground: Partial<Color> = {
   50: '#44494F'
 };
 export const darkThemeText = 'rgba(255, 255, 255, 0.87)';
+export const actionDisabledBackground = 'rgba(0, 0, 0, 0.12)';
+export const actionDisabledBackgroundDark = 'rgba(0, 0, 0, 0.9)';
 
 export const commonPalette = {
   gray,
@@ -149,11 +158,43 @@ export const overrides = {
   ...componentProps,
   MuiTextField: {
     styleOverrides: {
-      root: {
+      root: ({ props }: { props: { multiline?: boolean } }) => ({
         width: '100%',
-        height: '40px',
         fontSize: '16px',
-        padding: 0
+        padding: 0,
+        ...(props.multiline ? {} : { height: '40px' })
+      })
+    }
+  },
+  MuiOutlinedInput: {
+    styleOverrides: {
+      root: {
+        lineHeight: 'inherit',
+        '&:has(.MuiSelect-select)': {
+          paddingLeft: 0
+        },
+        '& textarea': {
+          '&:focus': {
+            border: 'none !important',
+            boxShadow: 'none'
+          }
+        },
+        '& input, &input:focus': {
+          padding: '6px 12px !important',
+          margin: 0,
+          border: 'none !important',
+          boxShadow: 'none',
+          color: 'inherit'
+        }
+      }
+    }
+  },
+  MuiFormHelperText: {
+    styleOverrides: {
+      root: {
+        marginLeft: 0,
+        fontSize: 14,
+        fontWeight: 500
       }
     }
   },
@@ -171,10 +212,10 @@ export const overrides = {
           margin: 0
         },
         [`& .${outlinedInputClasses.root}`]: {
-          padding: 0
+          padding: '0 !important'
         },
         [`& .${inputBaseClasses.input}::placeholder`]: {
-          opacity: 1
+          opacity: 0.42
         },
         [`& .${outlinedInputClasses.notchedOutline}`]: {
           border: '0px solid transparent',
@@ -235,7 +276,10 @@ export const overrides = {
     styleOverrides: {
       root: {
         paddingTop: 11,
-        paddingBottom: 11
+        paddingBottom: 11,
+        '&.Mui-disabled': {
+          opacity: 1
+        }
       }
     }
   },
@@ -247,19 +291,152 @@ export const overrides = {
       }
     }
   },
+  MuiSwitch: {
+    styleOverrides: {
+      root: {
+        '& input[type="checkbox"]': {
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          minWidth: 0,
+          height: '100%',
+          minHeight: 0,
+          margin: 0,
+          padding: 0,
+          border: 0,
+          borderRadius: 0,
+          background: 'none'
+        },
+        [`& .${switchClasses.switchBase}`]: {
+          color: '#F4F4F5',
+          [`& + .${switchClasses.track}`]: {
+            backgroundColor: actionDisabledBackground,
+            opacity: 1
+          },
+          [`&.${switchClasses.checked}`]: {
+            color: blue[500],
+            [`& + .${switchClasses.track}`]: {
+              backgroundColor: blue[500],
+              opacity: 0.5
+            }
+          }
+        }
+      }
+    }
+  },
+  MuiLink: {
+    styleOverrides: {
+      root: {
+        textDecoration: 'none'
+      }
+    }
+  },
+  MuiTable: {
+    styleOverrides: {
+      root: {
+        border: '1px solid #E5E5E5',
+        borderCollapse: 'collapse',
+        fontSize: 14,
+        fontWeight: 500,
+        backgroundColor: '#fff'
+      }
+    }
+  },
+  MuiTableHead: {
+    styleOverrides: {
+      root: {
+        backgroundColor: 'transparent'
+      }
+    }
+  },
   MuiTableCell: {
     styleOverrides: {
       root: {
-        padding: '0px 24px 0px 24px',
-        height: '48px'
+        padding: '8px 12px',
+        height: 'auto',
+        lineHeight: 1.5,
+        // grid-style table: every cell carries its own bottom + right border
+        borderBottom: '1px solid #E5E5E5',
+        borderRight: '1px solid #E5E5E5',
+        fontSize: 14,
+        fontWeight: 500,
+        color: 'inherit',
+        wordBreak: 'break-word',
+        // last cell in a row drops the right border so we don't double up
+        // against the table's outer border
+        '&:last-child': {
+          borderRight: 'none'
+        }
       },
       head: {
-        height: '56px',
-        lineHeight: '1.15rem'
+        padding: '12px 12px',
+        color: '#767676',
+        fontWeight: 600,
+        backgroundColor: 'transparent',
+        whiteSpace: 'nowrap'
       },
       paddingCheckbox: {
-        padding: '0 0 0 6px',
-        width: '54px'
+        // !important needed so `paddingCheckbox` wins against the `head`
+        // padding override above when both classes are applied to the same
+        // <th> in the table header
+        padding: '0 0 0 6px !important',
+        width: '40px',
+        textAlign: 'center',
+        verticalAlign: 'middle'
+      }
+    }
+  },
+  MuiTableContainer: {
+    styleOverrides: {
+      root: {
+        boxShadow: 'none',
+        backgroundColor: 'transparent'
+      }
+    }
+  },
+  MuiDialog: {
+    styleOverrides: {
+      paper: {
+        '&.MuiDialog-paper': {
+          padding: 0
+        }
+      }
+    }
+  },
+  MuiDialogTitle: {
+    styleOverrides: {
+      root: {
+        fontSize: 16,
+        fontWeight: 700,
+        padding: '16px 8px 16px 16px',
+        marginBottom: 16
+      }
+    }
+  },
+  MuiDialogContent: {
+    styleOverrides: {
+      root: {
+        padding: 16,
+        fontSize: 14,
+        fontWeight: 500,
+        lineHeight: '20px'
+      }
+    }
+  },
+  MuiDialogActions: {
+    styleOverrides: {
+      root: {
+        padding: 16
+      }
+    }
+  },
+  MuiBackdrop: {
+    styleOverrides: {
+      root: {
+        '&:not(.MuiBackdrop-invisible)': {
+          backgroundColor: 'rgba(0, 0, 0, 0.64)'
+        }
       }
     }
   }
